@@ -1,103 +1,110 @@
-import Image from "next/image";
+"use client";
+import { useState } from "react";
+import Splash from "@/components/Splash";
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [file, setFile] = useState<File | null>(null);
+  const [msg, setMsg] = useState("");
+  const [q, setQ] = useState("");
+  const [a, setA] = useState("");
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  async function onUpload(e: React.FormEvent) {
+    e.preventDefault();
+    if (!file) { setMsg("yo, pick a PDF first 🤌"); return; }
+    const fd = new FormData();
+    fd.append("pdf", file);
+    setMsg("beaming your PDF…");
+    const res = await fetch("/api/upload", { method: "POST", body: fd });
+    const data = await res.json().catch(() => ({}));
+    setMsg(res.ok ? "all set. lore locked 🔒" : `whoa: ${data.error || "upload failed"}`);
+  }
+
+  async function onAsk(e: React.FormEvent) {
+    e.preventDefault();
+    setA("thinking hard…");
+    const res = await fetch("/api/ask", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ question: q }),
+    });
+    const data = await res.json().catch(() => ({}));
+    setA(res.ok ? data.answer : `error: ${data.error}`);
+  }
+
+  return (
+    <>
+      <Splash />
+      <main className="min-h-screen flex flex-col items-center justify-start p-6
+                       bg-gradient-to-br from-black via-neutral-900 to-black">
+        {/* HERO */}
+        <header className="text-center mt-10">
+          <h1 className="text-7xl md:text-8xl font-extrabold tracking-widest
+                         text-neon-yellow drop-shadow-neonYellow animate-pulseNeon">
+            ASK PDF
+          </h1>
+          <p className="mt-4 text-neutral-400 text-lg">Upload • Ask • Get instant answers</p>
+        </header>
+
+        {/* CARD */}
+        <div className="w-full max-w-2xl mt-12 rounded-3xl border border-neon-pink neon-border
+                        bg-black/70 backdrop-blur-xl shadow-glow p-10 flex flex-col gap-10">
+
+          {/* Upload Section */}
+          <div className="rounded-2xl border border-neon-yellow p-6 space-y-4 shadow-glow">
+            <form onSubmit={onUpload} className="space-y-4 text-center">
+              <label className="mx-auto flex h-28 w-full max-w-md cursor-pointer items-center justify-center
+                                 rounded-xl border-2 border-dashed border-neon-pink
+                                 hover:border-neon-orange bg-neutral-800/50 text-white transition">
+                <input
+                  type="file"
+                  accept="application/pdf"
+                  className="hidden"
+                  onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+                />
+                <span className="text-sm">
+                  {file ? file.name : "📄 Drag & Drop or Click to Choose PDF"}
+                </span>
+              </label>
+
+              <button
+                type="submit"
+                className="inline-flex items-center gap-2 rounded-xl
+                           bg-neon-orange px-6 py-3 font-semibold text-black
+                           hover:bg-neon-yellow transition shadow-glow">
+                ⬆ Upload PDF
+              </button>
+
+              {msg && <p className="text-xs text-neutral-400">{msg}</p>}
+            </form>
+          </div>
+
+          {/* Ask Section */}
+          <div className="rounded-2xl border border-neon-yellow p-6 space-y-3 shadow-glow">
+            <form onSubmit={onAsk} className="space-y-3">
+              <input
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+                placeholder="🤔 ask me anything…"
+                className="w-full rounded-xl border border-neutral-700 bg-neutral-900/70
+                           px-4 py-3 text-white placeholder-neutral-500
+                           focus:outline-none focus:ring-2 focus:ring-neon-blue"
+              />
+              <button
+                className="w-full rounded-xl bg-neon-red px-4 py-3 font-semibold text-white
+                           hover:bg-neon-pink transition shadow-glow">
+                ⚡ Ask
+              </button>
+            </form>
+          </div>
+
+          {/* Answer Section */}
+          <div className="rounded-2xl border border-neon-yellow p-6 shadow-glow">
+            <section className="text-sm text-white min-h-[120px]">
+              {a || "💡 your answer will appear here..."}
+            </section>
+          </div>
         </div>
       </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+    </>
   );
 }
