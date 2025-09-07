@@ -1,36 +1,54 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AskPDF – PDF Q&A App
 
-## Getting Started
+This project is a small full-stack app I built as part of an assignment. The goal is straightforward:  
+upload a PDF, type in your question, and get back answers based on the document. I wanted it to feel
+a little different than the usual “utility” apps, so I gave it a neon-styled interface that makes
+the whole process look more fun.
 
-First, run the development server:
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+->Tech Stack
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- Next.js (App Router + API routes)
+- TypeScript
+- TailwindCSS ,with a custom neon theme
+- OpenAI API ,for generating answers
+- Pdf-parse ,for PDF text extraction
+- Node.js file system for saving parsed text and metadata
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+  
 
-## Learn More
+->Getting Started
 
-To learn more about Next.js, take a look at the following resources:
+1. Clone the repo:
+      1. git clone https://github.com/<your-username>/pdf-qa.git
+      2. cd pdf-qa
+   
+3. Install Dependencies: npm install
+   
+5. Set up environment variables: Create a .env.local file in the root folder and add the necessary fields.
+   
+7. Run the app: npm run dev
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+   
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+->Features
+ 1. Secure login before uploading or asking questions
+ 2. Upload any PDF (text content is parsed and stored locally)
+ 3. Neon-themed UI with dark/light toggle
+ 4. Simple workflow: Upload → Ask → Get answers
+ 5. Clean separation of frontend and backend routes
 
-## Deploy on Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+ 
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+->How to Use
+1. Log in with the passcode (set in .env.local).
+2. Upload a PDF file.
+3. Type a question and hit Ask
+4. Answer appears below in real time.
+  
+ 
+
+
+That’s it — thanks for checking it out!
